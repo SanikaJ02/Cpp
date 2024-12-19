@@ -1,0 +1,197 @@
+#include<iostream>
+#include<stack>
+using namespace std;
+
+// Structure for Tree Node
+struct TreeNode {
+    char data;
+    TreeNode* left; // left child
+    TreeNode* right; // right child
+};
+
+// Class Tree for implementing Tree data structure
+class Tree {
+public:
+    // Function to create a tree using Postfix expression and return
+    TreeNode* createByPostfix(char postfix[]) {
+        stack<TreeNode*> s;
+        for (int i = 0; postfix[i] != '\0'; i++) {
+            char token = postfix[i];
+            if (isalnum(token)) {
+                TreeNode* p = new TreeNode();
+                p->data = token;
+                p->left = NULL;
+                p->right = NULL;
+                s.push(p); // Push operands to the stack
+            } else {
+                TreeNode* p = new TreeNode();
+                p->data = token;
+                p->right = s.top(),s.pop();
+                p->left =  s.top(),s.pop();
+                s.push(p); // Push the new tree to the stack
+            }
+        }
+        return s.top(); // the remaining element in the stack is root of tree
+    }
+
+    // Function to create a tree using Prefix expression and return
+    TreeNode* createByPrefix(char prefix[]) {
+        stack<TreeNode*> s;
+        int i;
+        for (i = 0; prefix[i] != '\0'; i++) {}
+        i = i - 1;
+        for (; i >= 0; i--) {
+            char token = prefix[i];
+            if (isalnum(token)) {
+                TreeNode* p = new TreeNode();
+                p->data = token;
+                p->left = NULL;
+                p->right = NULL;
+                s.push(p);
+            } else {
+                TreeNode* p = new TreeNode();
+                p->data = token;
+                p->left = s.top();
+                s.pop();
+                p->right = s.top();
+                s.pop();
+                s.push(p);
+            }
+        }
+        return s.top();
+    }
+
+    // Recursive Function for inorder traversal of tree
+    void inorder(TreeNode* treeNode) {
+        if (treeNode != NULL) {
+            inorder(treeNode->left);
+            cout << treeNode->data;
+            inorder(treeNode->right);
+        }
+    }
+
+    // Recursive Function for preorder traversal of tree
+    void preorder(TreeNode* treeNode) {
+        if (treeNode != NULL) {
+            cout << treeNode->data;
+            preorder(treeNode->left);
+            preorder(treeNode->right);
+        }
+    }
+
+    // Recursive Function for postorder traversal of tree
+    void postorder(TreeNode* treeNode) {
+        if (treeNode != NULL) {
+            postorder(treeNode->left);
+            postorder(treeNode->right);
+            cout << treeNode->data;
+        }
+    }
+
+    // Function for Inorder Tree Traversing WITHOUT RECURSION
+    void inorder_norecursion(TreeNode* treeNode) {
+        stack<TreeNode*> s;
+         while(treeNode != NULL)
+    {
+        s.push(treeNode);
+        treeNode = treeNode->left;
+    }
+    while(!s.empty())
+    {
+        treeNode = s.top(),s.pop();
+        cout<<treeNode->data;
+        treeNode = treeNode->right;
+        while(treeNode != NULL)
+        {
+            s.push(treeNode);
+            treeNode = treeNode->left;
+        }
+    }
+}
+    
+
+    // Function for Preorder Tree Traversing WITHOUT RECURSION
+    void preorder_norecursion(TreeNode* treeNode) {
+        stack<TreeNode*> s;
+        while(treeNode != NULL)
+    {
+        cout<<treeNode->data;
+        s.push(treeNode);
+        treeNode = treeNode->left;
+    }
+    while(!s.empty())
+    {
+        treeNode =s.top(), s.pop();
+        treeNode = treeNode->right;
+        while(treeNode != NULL)
+        {
+            cout<<treeNode->data;
+            s.push(treeNode);
+            treeNode = treeNode->left;
+        }
+    }
+}
+    
+
+   
+};
+
+// Function main
+int main() {
+    Tree tree;
+    int choice;
+    TreeNode* root = NULL;
+    do {
+        cout << "\n===========================================================\n";
+        cout << "\n**Menu** \n\n1.Construct Tree\n2.Inorder Traversal Tree\n3.Preorder Traversal Tree\n4.Postorder Traversal Tree\n5.Exit";
+        cout << "\n\nEnter Your Choice: ";
+        cin >> choice;
+        switch (choice) {
+        case 1: {
+            int ch;
+            char expression[20];
+            cout << "\nCHOOSE:\n1. Postfix Expression\n2. Prefix Expression\n";
+            cout << "\nEnter Choice: ";
+            cin >> ch;
+            if (ch == 1) {
+                cout << "\nEnter Postfix Expression: ";
+                cin >> expression;
+                root = tree.createByPostfix(expression);
+            } else if (ch == 2) {
+                cout << "\nEnter Prefix Expression: ";
+                cin >> expression;
+                root = tree.createByPrefix(expression);
+            } else {
+                cout << "\nINVALID CHOICE!!\n";
+            }
+            cout << "\nTREE CONSTRUCTED SUCCESSFULLY!!!\n";
+            break;
+        }
+        case 2:
+            cout << "\nINORDER (RECURSIVE):\t";
+            tree.inorder(root);
+            cout << "\nINORDER (NON RECURSIVE):\t";
+            tree.inorder_norecursion(root);
+            cout << endl;
+            break;
+        case 3:
+            cout << "\nPREORDER (RECURSIVE):\t";
+            tree.preorder(root);
+            cout << "\nPREORDER (NON RECURSIVE):\t";
+            tree.preorder_norecursion(root);
+            cout << endl;
+            break;
+        case 4:
+            cout << "\nPOSTORDER (RECURSIVE):\t";
+            tree.postorder(root);
+            cout << endl;
+            break;
+        case 5:
+            cout << "\nThank You!!\n";
+            break;
+        default:
+            cout << "\nInvalid choice!!\n";
+        }
+    } while (choice != 5);
+    return 0;
+}

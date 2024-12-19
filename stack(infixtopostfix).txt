@@ -1,0 +1,242 @@
+# include<iostream>
+#include<string.h>
+#include<cctype> // for isalpha and isalnum
+#define max 30
+using namespace std;
+struct node
+{
+    int data;    // changed to store integer data for evaluation
+    struct node *next;
+};
+
+class stack
+{
+    node *top;   // pointer to the top of the stack
+
+public: 
+    stack()
+    {
+        top = NULL;  // initial stack is empty
+    }
+
+    bool empty()
+    {
+        return (top == NULL);  // returns true if stack is empty, else false
+    }
+
+    void push(int y)
+    {
+        node *p = new node;
+        p->data = y;
+        p->next = top;
+        top = p;
+    }
+
+    int pop()     // delete and return the topmost element
+    {
+        if (!empty())
+        {
+            node *p = top;
+            top = top->next;
+            int val = p->data;
+            delete p;
+            return val;  // Return value of deleted node
+        }
+        else
+        {
+            cout << "Stack is empty\n";
+            return 0;  // Indicating stack is empty
+        }
+    }
+
+    int peek()   // returns the top element without popping it
+    {
+        if (!empty())
+        {
+            return top->data;
+        }
+        return 0;
+    }
+};
+
+int precedence(char y);
+void infixToPrefix(char infix[], char prefix[]);
+void infixToPostfix(char infix[], char postfix[]);
+void evaluate_prefix(char prefix[]);
+void evaluate_postfix(char postfix[]);
+int evaluate(char y, int op1, int op2);
+
+int main()
+{
+    char infix[30], prefix[30], postfix[30];
+    int op;
+    do {
+        cout << "\n Menu: \n 1. Infix to Prefix with evaluation \n 2. Infix to Postfix with evaluation \n 3. Quit \n Enter your choice: ";
+        cin >> op;
+        switch (op)
+        {
+            case 1:
+                cout << "Enter the Infix expression: " << endl;
+                cin >> infix;
+                infixToPrefix(infix, prefix);
+                cout << "\nPrefix expression is: " << prefix << endl;
+                cout << "\nEvaluation of Prefix expression:";
+                evaluate_prefix(prefix);
+                break;
+
+            case 2:
+                cout << "\nEnter the infix expression:" << endl;
+                cin >> infix;
+                infixToPostfix(infix, postfix);
+                cout << "\nPostfix expression is: " << postfix << endl;
+                cout << "\nEvaluation of Postfix expression:";
+                evaluate_postfix(postfix);
+                break;
+        }
+    } while (op != 3);
+    return 0;
+}
+
+void infixToPrefix(char infix[], char prefix[])
+{
+    int i, j;
+    char temp, in1[30];
+
+    for (i = strlen(infix) - 1, j = 0; i >= 0; i--, j++)
+        in1[j] = infix[i];
+    in1[j] = '\0';
+
+    for (i = 0; in1[i] != '\0'; i++)
+    {
+        if (in1[i] == '(')
+            in1[i] = ')';
+        else if (in1[i] == ')')
+            in1[i] = '(';
+    }
+
+    infixToPostfix(in1, prefix);
+
+    for (i = 0, j = strlen(prefix) - 1; i < j; i++, j--)
+    {
+        temp = prefix[i];
+        prefix[i] = prefix[j];
+        prefix[j] = temp;
+    }
+}
+
+void infixToPostfix(char infix[], char postfix[])
+{
+    stack s;
+    char x;
+    int i, j = 0;
+    char token;
+
+    for (i = 0; infix[i] != '\0'; i++)
+    {
+        token = infix[i];
+        if (isalnum(token))
+        {
+            postfix[j++] = token;
+        }
+        else if (token == '(')
+        {
+            s.push(token);
+        }
+        else if (token == ')')
+        {
+            while ((x = s.pop()) != '(')
+                postfix[j++] = x;
+        }
+        else
+        {
+            while (!s.empty() && precedence(s.peek()) >= precedence(token))
+            {
+                postfix[j++] = s.pop();
+            }
+            s.push(token);
+        }
+    }
+
+    while (!s.empty())
+    {
+        postfix[j++] = s.pop();
+    }
+    postfix[j] = '\0';
+}
+
+int precedence(char x)
+{
+    if (x == '(') return 0;
+    if (x == '+' || x == '-') return 1;
+    if (x == '*' || x == '/' || x == '%') return 2;
+    return 3;
+}
+
+void evaluate_prefix(char prefix[])
+{
+    stack s;
+    char x;
+    int op1, op2, val, i;
+
+    for (i = strlen(prefix) - 1; i >= 0; i--)
+    {
+        x = prefix[i];
+        if (isalpha(x))
+        {
+            cout << "\nEnter the value of " << x << ": ";
+            cin >> val;
+            s.push(val);
+        }
+        else
+        {
+            op1 = s.pop();
+            op2 = s.pop();
+            val = evaluate(x, op1, op2);
+            s.push(val);
+        }
+    }
+
+    val = s.pop();
+    cout << "\nValue of expression is: " << val;
+}
+
+void evaluate_postfix(char postfix[])
+{
+    stack s;
+    char x;
+    int op1, op2, val, i;   
+
+    for (i = 0; postfix[i] != '\0'; i++)
+    {
+        x = postfix[i];
+        if (isalpha(x))
+        {
+            cout << "\nEnter the value of " << x << ": ";
+            cin >> val;
+            s.push(val);
+        }
+        else
+        {
+            op2 = s.pop();
+            op1 = s.pop();
+            val = evaluate(x, op1, op2);
+            s.push(val);
+        }
+    }
+
+    val = s.pop();
+    cout << "\nValue of expression is: " << val;
+}
+
+int evaluate(char y, int op1, int op2)
+{
+    switch (y)
+    {
+        case '+': return op1 + op2;
+        case '-': return op1 - op2;
+        case '*': return op1 * op2;
+        case '/': return op1 / op2;
+        case '%': return op1 % op2;
+        default: return 0;
+    }
+}

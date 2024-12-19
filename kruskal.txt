@@ -1,0 +1,103 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+#include<climits>
+using namespace std;
+
+struct Edge{
+    int src,dest,weight;
+};
+
+bool compare(Edge a, Edge b)
+{
+    return a.weight<b.weight;
+}
+
+class Graph{
+    int V;
+    vector<Edge>edges;
+
+    public:
+    Graph(int V)
+    {
+        this->V=V;
+
+    }
+
+    void addEdge(int u,int v,int w)
+    {
+        edges.push_back({u,v,w});
+    }
+
+    int findparent(vector<int>&parent,int i)
+    {
+        if(parent[i]==i)
+        {
+            return i;
+        }
+        return parent[i]=findparent(parent,parent[i]);
+    }
+
+    void unionSets(vector<int>&parent,vector<int>&rank,int u,int v)
+    {
+        int rootU= findparent(parent,u);
+        int rootV= findparent(parent,v);
+        if (rank[rootU] < rank[rootV]) {
+            parent[rootU] = rootV;
+        } else if (rank[rootU] > rank[rootV]) {
+            parent[rootV] = rootU;
+        } else {
+            parent[rootV] = rootU;
+            rank[rootU]++;
+        }
+    }
+
+    void KruskalMst()
+    {
+        vector<Edge>result;
+        vector<int>parent(V);
+        vector<int>rank(V,0);
+
+        for(int i=0;i<V;i++)
+        {
+            parent[i]=i;
+        }
+
+        sort(edges.begin(),edges.end(),compare);
+
+        for(Edge&e:edges)
+        {
+            int u=findparent(parent,e.src);
+            int v=findparent(parent,e.dest);
+            if(u!=v)
+            {
+                result.push_back(e);
+                unionSets(parent,rank,u,v);
+            }
+        }
+        cout<<"Kruskal MST:";
+        int totalWeight = 0;
+        for (Edge& e : result) {
+        cout<<"Edge:"<<e.src<<"-"<<e.dest<<" | weight:"<<e.weight<<endl;
+        totalWeight+=e.weight;
+        }
+        cout<<"total weight:"<<totalWeight;
+    }
+};
+
+int main()
+{
+    int V=4;
+    Graph graph(V);
+    graph.addEdge(0, 2, 7);
+    graph.addEdge(0, 3, 5);
+    graph.addEdge(1, 2, 3);
+    graph.addEdge(1, 3, 8);
+    graph.addEdge(0, 1, 4);
+    
+    graph.KruskalMst();
+
+    return 0;
+
+}
+

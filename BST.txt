@@ -1,0 +1,218 @@
+#include<iostream>
+#include<queue>
+using namespace std;
+
+struct Treenode
+{
+    int data;
+    Treenode*left;
+    Treenode*right;
+};
+class Tree
+{
+    Treenode*t;  //root node
+    public:
+    Tree()
+    {
+        t=NULL;
+    }
+
+    Treenode*insert(Treenode*t,int key)
+    {
+        if(t==NULL)
+        {
+            Treenode*p=new Treenode();
+            p->data=key;
+            p->left=p->right=NULL;
+            return p;
+        }
+        if(key<t->data)
+        {
+            t->left=insert(t->left,key);
+        }
+        else if(key>t->data)
+        {
+            t->right=insert(t->right,key);
+        }
+        return t;
+    }
+
+    void inorder(Treenode*t)
+    {
+        if(t!=NULL)
+        {
+            inorder(t->left);
+            cout<<"\t"<<t->data;
+            inorder(t->right);
+        }
+    }
+
+    Treenode*search(Treenode*t,int  key)
+    {
+        Treenode*s=t;
+        while(s!=NULL)
+        {
+        if(s->data==key)
+        {
+            return s;
+        }
+        else if(s->data<key)
+        {
+            s=s->right;
+        }
+        else{
+            s=s->left;
+        }
+        }
+        return NULL;
+    }
+
+    Treenode*mirror(Treenode*t)
+    {
+        Treenode*temp;
+        if(t==NULL)
+        {
+            return NULL;
+        }
+        temp=t->left;
+        t->left=mirror(t->right);
+        t->right=mirror(temp);
+        return t;
+    }
+
+    Treenode*getMin(Treenode*r)
+    {
+        while(r->left!=NULL)
+        {
+            r=r->left;
+        }
+        return r;
+
+    }
+
+    Treenode*del(Treenode*t,int key)
+    {
+        Treenode *temp;
+        if (t == NULL) {
+            return NULL;
+        }
+        if(key<t->data)
+        {
+            t->left=del(t->left,key);
+            return t;
+        }
+        else if(key>t->data)
+        {
+            t->right=del(t->right,key);
+        }
+        // node found 3 cases
+        if(t->left==NULL&&t->right==NULL)
+        {
+            temp=t;
+            delete temp;
+            return NULL;
+        }
+        else if(t->left!=NULL&&t->right==NULL)
+        {
+            temp=t;
+            t=t->left;
+            delete temp;
+            return t;
+        }
+        else if(t->left==NULL&&t->right!=NULL)
+        {
+            temp=t;
+            t=t->right;
+            delete temp;
+            return t;
+        }
+        else
+        {
+        temp = getMin(t->right);
+        t->data = temp->data;
+        t->right = del(t->right, temp->data);
+        return t;
+        }
+
+
+    }
+
+    void displayLeafNodes(Treenode *t) {
+        if (t == NULL)
+            return;
+
+        if (t->left == NULL && t->right == NULL) {
+            cout << " " << t->data;
+            return;
+        }
+            displayLeafNodes(t->left);
+            displayLeafNodes(t->right);
+    }
+
+    
+
+};
+
+int main()
+{
+    int choice, key;
+    Treenode *root=NULL, *result;
+    Tree t;
+    do {
+        cout << "\n=======================================";
+        cout << "\nMENU";
+        cout << "\n=======================================";
+        cout << "\n1.Insert\n2.Display\n3.Search\n4.Delete\n5.Mirror image\n6.Minimum\n7.Display Leaf Nodes\n8.Exit";
+        cout << "\n\nEnter your Choice : ";
+        cin >> choice;
+        switch (choice) {
+            case 1:
+            cout << "\nEnter the number to Insert : ";
+            cin >> key;
+            root=t.insert(root,key);
+            break;
+            case 2:
+            t.inorder(root);
+            break;
+            case 3:
+            cout << "\nEnter the Node to search :";
+            cin >> key;
+            result = t.search(root,key);
+            if (result == NULL) {
+                cout << "\nNODE " << key << " NOT FOUND";
+            } else {
+                cout << "\nNODE " << key << " IS FOUND" << endl;
+            }
+            break;
+            case 4:
+            cout << "\nEnter the Node to delete :";
+            cin >> key;
+            result = t.del(root, key);
+            root = result;
+            cout << "\nNODE DELETED !!";
+            break;
+            case 5:
+            root = t.mirror(root);
+            cout << "\nMirror image of the binary Tree :";
+            t.inorder(root);
+            break;
+            case 6:
+             result = t.getMin(root);
+            cout << "\n ";
+            cout << "\nMINIMUM = " << result->data;
+            cout << "\n ";
+            break;
+            case 7:
+             t.displayLeafNodes(root);
+            break;
+            case 8:
+            cout<<"exit";
+            default:
+            cout<<"Invalid choice";
+        }
+    }while(choice!=8);
+            
+
+
+}
+

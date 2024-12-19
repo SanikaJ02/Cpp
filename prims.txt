@@ -1,0 +1,90 @@
+#include<iostream>
+#include<vector>
+#include<climits>
+#include<algorithm>
+using namespace std;
+
+class Graph
+{
+    int V;
+    vector<vector<int>> adjMatrix;
+
+    public:
+    Graph(int V)
+    {
+        this->V=V;
+        adjMatrix=vector<vector<int>>(V,vector<int>(V,0));
+
+    }
+
+    void addEdge(int u,int v,int w)
+    {
+        adjMatrix[u][v]=w;
+        adjMatrix[v][u]=w;
+    }
+
+    void PrimMst()
+    {
+    
+    vector<int>key(V,INT_MAX);
+    vector<int>parent(V,-1);
+    vector<bool>inMST(V,false);
+
+    key[0]=0;
+
+    for(int count=0;count<V-1;count++)
+    {
+        int minkey= INT_MAX,u;
+
+        for(int v=0;v<V;v++)
+        {
+            if(!inMST[v]&& key[v]<minkey)
+            {
+                minkey=key[v];
+                u=v;
+            }
+        }
+
+        inMST[u]=true;
+
+        for(int v=0;v<V;v++)
+        {
+            if(adjMatrix[u][v] && (!inMST[v] && adjMatrix[u][v]<key[v]))
+            {
+                key[v]=adjMatrix[u][v];
+                parent[v]=u;
+            }
+        }
+    }
+
+    cout<<"Prims MST:";
+    int totalw=0;
+    for(int i=1;i<V;i++)
+    {
+        cout<<"Edge: "<<parent[i]<<"-"<<i<<" | Weight: "<<adjMatrix[i][parent[i]]<<endl;
+        totalw+=adjMatrix[i][parent[i]];
+    }
+     cout << "Total Weight of MST: " << totalw << endl;
+
+}
+
+};
+
+int main()
+{
+    int V=4;
+    Graph graph(V);
+
+    graph.addEdge(0, 2, 7);
+    graph.addEdge(0, 3, 5);
+    graph.addEdge(1, 2, 3);
+    graph.addEdge(1, 3, 8);
+    graph.addEdge(0, 1, 4);
+
+    graph.PrimMst();
+
+    return 0;
+
+}
+
+

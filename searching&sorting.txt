@@ -1,0 +1,255 @@
+#include<iostream>
+#include<string.h>
+using namespace std;
+int const size=5;
+
+struct student
+{
+    int Roll_no;
+    char name[20];
+    float SGPA;
+
+};
+void accept(struct student list[size]);
+void display(struct student list[400]);
+void bubbleSort(struct student list[size]);
+void insertionSort(struct student list[size]);
+void search(struct student list[size]);
+void binarySearch(struct student list[size]);
+void quickSort(struct student list[size],int,int);
+void displayTop(struct student list[80]);
+
+main()
+{
+    int ch,i;
+    char cn;
+    struct student data[5];
+    accept(data);
+
+    do
+    {
+    cout<<"1: Roll call list\n";
+    cout<<"2: List of students alphabetically\n";
+    cout<<"3: To find 10 toppers\n";
+    cout<<"4: Search student according to SGPA\n";
+    cout<<"5: Search student according to name\n";
+    
+
+    cin>>ch;
+    
+    switch(ch)
+    {  
+    
+        case 1:
+        bubbleSort(data);
+        display(data);
+        break;
+
+        case 2:
+        insertionSort(data);
+        display(data);
+        break;
+
+        case 3:
+        quickSort(data,0,size-1);
+        displayTop(data);
+        break;
+        
+        case 4:
+        search(data);
+        break;
+        
+        case 5:
+        insertionSort(data);
+        binarySearch(data);
+        break;
+
+        default:
+        cout<<"Invalid choice";
+
+
+    }
+    
+
+  
+}while(ch!=5);
+
+
+}
+    
+
+        
+
+ 
+
+void accept(struct student list[size])
+{
+    int i;
+    cout<<"Enter the Roll no, name and SGPA:";
+    cout<<"\n\nRollNo\tName\tSGPA\n";
+    for(i=0;i<size;i++)
+    {
+        
+        cin>>list[i].Roll_no;
+        cout<<"\t";
+        cin>>list[i].name;
+        cout<<"\t";
+        cin>>list[i].SGPA;
+        cout<<"\n";
+    }
+
+}
+
+void display(struct student list[400])
+{
+    int i;
+    cout<<"\nRoll no\tName\tSGPA\n";
+    for(i=0;i<size;i++)
+    {
+        cout<<"\n"<<list[i].Roll_no<<"\t"<<list[i].name<<" \t "<<list[i].SGPA;
+    }
+}
+
+void displayTop(struct student list[80])
+{
+    int i;
+    cout<<"\nRoll no  Name  SGPA\n";
+    for(i=0;i<10;i++)
+    {
+        cout<<"\n"<<list[i].Roll_no<<"\t"<<list[i].name<<"\t"<<list[i].SGPA;
+
+    }
+
+}
+void bubbleSort(struct student list[size])
+{
+    int i, j;
+    struct student temp;
+
+    for (i = 0; i < size - 1; i++) {
+        for (j = 0; j < (size - 1 - i); j++) {
+            if (list[j].Roll_no > list[j + 1].Roll_no) {
+                temp = list[j];
+                list[j] = list[j + 1];
+                list[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void insertionSort(struct student list[size])
+{
+    int i,j; //i traverses the array, identifying the "current" element to place in its correct sorted position.j is used for shifting elements in the already sorted portion of the array.
+    struct student key;
+    for(i=1;i<size;i++)  //The loop starts from the second element (i = 1), assuming the first element (i = 0) is already sorted.
+    {
+        key=list[i];
+        j=i-1;           //Points to the last element of the already sorted portion of the array.
+        while(strcmp(list[j].name,key.name)>0 && j>=0)
+        {
+            list[j+1]=list[j];    //Shifts the j-th element one position to the right.
+            j=j-1;
+
+        }
+        list[j+1]=key;
+
+    
+    }
+
+}
+
+void search(struct student list[size])
+{ 
+    float SGPA;
+    int i;
+    int flag=0;
+    cout<<"Enter SGPA:";
+    cin>>SGPA;
+    
+     
+    cout<<"\nRoll no  Name   SGPA\n";
+    for(i=0;i<size;i++)
+    {
+        if(SGPA==list[i].SGPA)
+        {
+            cout<<"\n"<<list[i].Roll_no<<"\t "<< list[i].name<<"\t "<<list[i].SGPA;
+            flag++;
+        }
+
+    }
+    if(flag==0)
+    {
+        cout<<"Record not found";
+    }
+    
+}
+
+void binarySearch(struct student list[size])
+{
+    
+    int i,lower,upper,mid;
+    char search[80];
+    cout<<"Ente the name you want to search:\n";
+    cin>>search;
+    lower=0;
+    upper=size-1;
+    mid=(lower+upper)/2;
+    while(lower<=upper)
+    {
+        if(strcmp(list[mid].name,search)<0)
+        {
+            lower=mid+1;
+            mid=(lower+upper)/2;
+        }
+        else if(strcmp(list[mid].name,search)==0)
+        {
+            cout<<"\n"<<list[mid].Roll_no<<"\t"<<list[mid].name<<"\t"<<list[mid].SGPA;
+            break;
+        }
+        else{
+            upper=mid-1;
+            mid=(lower+upper)/2;
+
+        }
+        if(lower>upper)
+        {
+            cout<<search<<"Not found in the list";
+        }
+    }
+}
+
+void quickSort(struct student list[size],int first,int last)
+{
+    int pivot,i,j;
+    
+
+    if(first<last)
+    {
+        pivot=first;
+        i=first;
+        
+        j=last;
+
+        while(i<j)
+        {
+            while(list[i].SGPA>=list[pivot].SGPA && i<last)
+            {
+                i++;
+            }
+            while(list[j].SGPA<list[pivot].SGPA)
+            {
+                j--;
+            }
+            if(i<j)
+            {
+                swap(list[i], list[j]);
+
+            }
+        }
+    
+         swap(list[pivot], list[j]);
+         quickSort(list,first,j-1);
+         quickSort(list,j+1,last);
+
+    }
+}

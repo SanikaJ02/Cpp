@@ -1,0 +1,92 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
+#define V 5 // Number of vertices, assuming 5 landmarks in the city
+
+int minDistance(const vector<int> &dist, const vector<bool> &visited) {
+    int min = INT_MAX, min_index = -1;
+    for (int v = 0; v < V; ++v) {
+        if (!visited[v] && dist[v] <= min) {
+            min = dist[v];
+            min_index = v;
+        }
+    }
+    return min_index;
+}
+
+void printSolution(const vector<int> &dist) {
+    cout << "Shortest distances from the source to all destinations:\n";
+    for (int i = 0; i < V; ++i) {
+        cout << "Destination " << i << ": " << dist[i] << endl;
+    }
+}
+
+void dijkstra(vector<vector<int>> &graph, int src) {
+    vector<int> dist(V, INT_MAX); // Initialize distances
+    vector<bool> visited(V, false); // Track visited nodes
+
+    dist[src] = 0; // Distance to source is 0
+
+    for (int count = 0; count < V - 1; ++count) {
+        int u = minDistance(dist, visited); // Select the next minimum distance vertex
+        visited[u] = true; // Mark this vertex as visited
+
+        for (int v = 0; v < V; ++v) {
+            // Update dist[v] only if there's a shorter path
+            if (!visited[v] && graph[u][v] && dist[u] != INT_MAX && dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+
+    printSolution(dist); // Print the results
+}
+
+void inputGraph(vector<vector<int>> &graph) {
+    cout << "Enter the adjacency matrix for the graph (enter 0 if there is no direct edge between two landmarks):\n";
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            cout << "Distance between landmark " << i << " and landmark " << j << ": ";
+            cin >> graph[i][j];
+        }
+    }
+}
+
+int main() {
+    vector<vector<int>> graph(V, vector<int>(V, 0)); // Initialize graph as VxV matrix with 0s
+    int choice, src;
+
+    do {
+        cout << "\nMenu:\n";
+        cout << "1. Input graph data\n";
+        cout << "2. Run Dijkstra's algorithm\n";
+        cout << "3. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                inputGraph(graph);
+                cout << "Graph data input complete!\n";
+                break;
+            case 2:
+                cout << "Enter the source landmark (0-" << V-1 << "): ";
+                cin >> src;
+                if (src < 0 || src >= V) {
+                    cout << "Invalid source. Please enter a valid landmark between 0 and " << V-1 << ".\n";
+                } else {
+                    dijkstra(graph, src);
+                }
+                break;
+            case 3:
+                cout << "Exiting the program.\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 3);
+
+    return 0;
+}
